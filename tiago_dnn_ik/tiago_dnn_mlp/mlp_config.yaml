@@ -1,0 +1,31 @@
+simple_mlp:
+  data_dir: "pykin/6d_test"
+  save: True
+  units: 160
+  batch_size: 64
+  lr: 0.1
+  epochs: 200
+  verbose: 1
+deep_mlp:
+  data_dir: "pykin/cien_mil_quat_iqr"
+  save: True
+  num_layers: [20, 40, 20]
+  units: [128, 256, 128]
+  batch_size: 128
+  lr: 0.1
+  epochs: 200
+  verbose: 1
+seven_subnet_mlp:
+  data_dir: "pykin/cien_mil_currs"
+  save: True
+  units1: 16
+  units2: 272
+  units3: 496
+  units4: 496
+  units5: 496
+  units6: 496
+  units7: 272
+  batch_size: 128
+  lr: 0.1
+  epochs: 600
+  verbose: 1

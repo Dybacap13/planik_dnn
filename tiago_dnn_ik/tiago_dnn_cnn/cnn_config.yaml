@@ -1,0 +1,13 @@
+data_dir: "pykin/cien_mil_quat_iqr"
+save: True
+batch_size: 128
+epochs: 200
+verbose: 1
+lr: 0.1
+filters1: 1000
+filters2: 800
+units1: 800
+units2: 600
+units3: 400
+units4: 200
+units5: 100

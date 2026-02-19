@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<library path="lib/libtiago_data_generation">
+    <class name="tiago_data_generation/DatagenControllerPlugin"
+          type="tiago_controllers::DatagenController"
+          base_class_type="controller_interface::ControllerBase" />
+</library>

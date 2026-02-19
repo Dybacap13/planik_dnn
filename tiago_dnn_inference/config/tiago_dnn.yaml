@@ -1,0 +1,2 @@
+model: 'simple_mlp.keras'
+stats: 'cien_mil_quat_iqr.yaml'

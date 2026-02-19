@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /docker-ros/ws/tiago-rl-inference/devel/.private/catkin_tools_prebuild/setup.sh

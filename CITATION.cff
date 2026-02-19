@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: "If you found this project useful, please consider citing the following works:"
+authors:
+- family-names: "Calzada-Garcia"
+  given-names: "Ana"
+  orcid: "https://orcid.org/0009-0001-5891-2446"
+- family-names: "Victores"
+  given-names: "Juan G."
+  orcid: "https://orcid.org/0000-0002-3080-3467"
+- family-names: "Naranjo-Campos"
+  given-names: "Francisco J."
+  orcid: "https://orcid.org/0009-0009-3145-1342"
+- family-names: "Balaguer"
+  given-names: "Carlos"
+  orcid: "https://orcid.org/0000-0003-4864-4625"
+title: "Inverse Kinematics for Robotic Manipulators via Deep Neural Networks: Experiments and Results"
+doi: 10.3390/app15137226
+date-released: 2025-06-26
+url: "https://github.com/anacg1620/tiago_dnn_ik"
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Calzada-Garcia"
+    given-names: "Ana"
+    orcid: "https://orcid.org/0009-0001-5891-2446"
+  - family-names: "Victores"
+    given-names: "Juan G."
+    orcid: "https://orcid.org/0000-0002-3080-3467"
+  - family-names: "Naranjo-Campos"
+    given-names: "Francisco J."
+    orcid: "https://orcid.org/0009-0009-3145-1342"
+  - family-names: "Balaguer"
+    given-names: "Carlos"
+    orcid: "https://orcid.org/0000-0003-4864-4625"
+  doi: "10.3390/app15137226"
+  journal: "Applied Sciences"
+  month: 6
+  title: "Inverse Kinematics for Robotic Manipulators via Deep Neural Networks: Experiments and Results"
+  issue: 13
+  volume: 15
+  year: 2025

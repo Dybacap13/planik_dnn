@@ -1,0 +1,15 @@
+simple_rnn:
+  data_dir: "pykin/cien_mil_quat_iqr"
+  save: True
+  units: 12
+  batch_size: 128
+  epochs: 200
+  verbose: 1
+  lr: 0.1
+lstm:
+  data_dir: "pykin/cien_mil_quat_iqr"
+  save: True
+  batch_size: 128
+  epochs: 200
+  verbose: 1
+  lr: 0.1

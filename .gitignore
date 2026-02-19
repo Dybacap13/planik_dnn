@@ -1,0 +1,55 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Miscellanea
+**/build*/
+/.vs/
+/.vscode/
+
+# data
+/data
+*.png
+
+# trained models
+*.keras
+
+# logs
+**/logs
+**/wandb
+**/*_tuning
+**/__pycache__
+**/test
+**/data
+**.csv
+tiago_dnn_inference/models/
+tiago_dnn_ik/data

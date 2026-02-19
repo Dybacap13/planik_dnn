@@ -1,0 +1,8 @@
+<launch>
+    <node name="init_datagen" pkg="tiago_data_generation" type="init_datagen.py" output="screen"/>
+
+    <rosparam command="load" file="$(find tiago_data_generation)/config/datagen_controller.yaml"/>
+    <node name="datagen_controller_spawner"
+          pkg="controller_manager" type="spawner" output="screen"
+          args="--stopped datagen_controller"/>
+</launch>
