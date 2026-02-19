@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import wandb
+# import wandb
 import tensorflow as tf
 import numpy as np
 from pykin.robots.single_arm import SingleArm
@@ -68,13 +68,14 @@ def orientation_error(stats):
 
 class PositionError(tf.keras.callbacks.Callback):
     def __init__(self, validation_data, stats):
+        super(PositionError, self).__init__() 
         self.validation_data = validation_data
         self.stats = stats
         self.pos_error = []
 
     def eval_map(self):
         x_true, y_true = next(self.validation_data)
-        y_pred = self.model.predict(x_true)
+        y_pred = self.model.predict(x_true, verbose=0)  # добавьте verbose=0
         x_true = np.array(x_true)[:, :3]
 
         # De-standardization or de-normalization of inputs
@@ -95,10 +96,15 @@ class PositionError(tf.keras.callbacks.Callback):
 
         return np.mean(np.linalg.norm(x_true - x_pred, axis=1))
 
-    def on_epoch_end(self, epoch, logs={}):
+    def on_epoch_end(self, epoch, logs=None):
+        if logs is None:
+            logs = {}
+
         score = self.eval_map()
         # print ("Position error for epoch %d is %f"%(epoch, score))
-        wandb.log({'mean-position-error': score})
+        # wandb.log({'mean-position-error': score})
+        print(f"\n📏 Position error for epoch {epoch}: {score:.6f}")
+        logs['position_error'] = score
         self.pos_error.append(score)
 
 
@@ -110,7 +116,7 @@ class OrientationError(tf.keras.callbacks.Callback):
 
     def eval_map(self):
         x_true, y_true = next(self.validation_data)
-        y_pred = self.model.predict(x_true)
+        y_pred = self.model.predict(x_true, verbose=0)  # добавьте verbose=0
 
         # De-standardization or de-normalization of inputs
         # x -> pos, (orient), y -> joint angles
@@ -134,10 +140,13 @@ class OrientationError(tf.keras.callbacks.Callback):
 
         return np.mean(np.minimum(dif1, dif2))
 
-    def on_epoch_end(self, epoch, logs={}):
+    def on_epoch_end(self, epoch, logs=None):
+        if logs is None:
+            logs = {}
         score = self.eval_map()
-        # print ("Position error for epoch %d is %f"%(epoch, score))
-        wandb.log({'mean-orientation-error': score})
+        print(f"\n🧭 Orientation error for epoch {epoch}: {score:.6f}")
+        logs['orientation-error'] = score
+        # wandb.log({'mean-orientation-error': score})
         self.orient_error.append(score)
 
 
@@ -183,7 +192,7 @@ class QuaternionError1(tf.keras.callbacks.Callback):
         global orient_true
         global orient_pred
         x_true, y_true = next(self.validation_data)
-        y_pred = self.model.predict(x_true)
+        y_pred = self.model.predict(x_true, verbose=0)  # добавьте verbose=0
         orient_true = np.array(x_true)[:, 3:]
 
         # De-standardization or de-normalization of inputs
@@ -206,10 +215,14 @@ class QuaternionError1(tf.keras.callbacks.Callback):
 
         return np.mean(np.minimum(dif1, dif2))
 
-    def on_epoch_end(self, epoch, logs={}):
+    def on_epoch_end(self, epoch, logs=None):
+        if logs is None:
+            logs = {}
+
         score = self.eval_map()
-        # print ("Quaternion error 1 for epoch %d is %f"%(epoch, score))
-        wandb.log({'quaternion-error-1': score})
+        print ("Quaternion error 1 for epoch %d is %f"%(epoch, score))
+        # wandb.log({'quaternion-error-1': score})
+        logs['quaternion-error-1'] = score
         self.quat_error1.append(score)
 
 
@@ -226,10 +239,14 @@ class QuaternionError2(tf.keras.callbacks.Callback):
 
         return np.mean(np.arccos(np.abs(prod)))
 
-    def on_epoch_end(self, epoch, logs={}):
+    def on_epoch_end(self, epoch, logs=None):
+        if logs is None:
+            logs = {}
+
         score = self.eval_map()
-        # print ("Quaternion error 2 for epoch %d is %f"%(epoch, score))
-        wandb.log({'quaternion-error-2': score})
+        print ("Quaternion error 2 for epoch %d is %f"%(epoch, score))
+        logs['quaternion-error-2'] = score
+        # wandb.log({'quaternion-error-2': score})
         self.quat_error2.append(score)
 
 
@@ -246,10 +263,14 @@ class QuaternionError3(tf.keras.callbacks.Callback):
 
         return np.mean(1 - np.abs(prod))
 
-    def on_epoch_end(self, epoch, logs={}):
+    def on_epoch_end(self, epoch, logs=None):
+        if logs is None:
+            logs = {}
+
         score = self.eval_map()
-        # print ("Quaternion error 3 for epoch %d is %f"%(epoch, score))
-        wandb.log({'quaternion-error-3': score})
+        print ("Quaternion error 3 for epoch %d is %f"%(epoch, score))
+        logs['quaternion-error-3'] = score
+        # wandb.log({'quaternion-error-3': score})
         self.quat_error3.append(score)
 
 
@@ -309,7 +330,7 @@ class RotMatrixError1(tf.keras.callbacks.Callback):
         global orient_true
         global orient_pred
         x_true, y_true = next(self.validation_data)
-        y_pred = self.model.predict(x_true)
+        y_pred = self.model.predict(x_true, verbose=0)  # добавьте verbose=0
         orient_true = np.array(x_true)[:, 3:]
 
         # De-standardization or de-normalization of inputs
@@ -335,10 +356,15 @@ class RotMatrixError1(tf.keras.callbacks.Callback):
 
         return np.mean(ret)
 
-    def on_epoch_end(self, epoch, logs={}):
+    def on_epoch_end(self, epoch, logs=None):
+        if logs is None:
+            
+            logs = {}
+
         score = self.eval_map()
-        # print ("Rotation Matrix error 1 for epoch %d is %f"%(epoch, score))
-        wandb.log({'rotmatrix-error-1': score})
+        print ("Rotation Matrix error 1 for epoch %d is %f"%(epoch, score))
+        # wandb.log({'rotmatrix-error-1': score})
+        logs['rotmatrix-error-1'] = score
         self.rotmatrix_error1.append(score)
 
 
@@ -355,10 +381,14 @@ class RotMatrixError2(tf.keras.callbacks.Callback):
 
         return np.mean(ret)
 
-    def on_epoch_end(self, epoch, logs={}):
+    def on_epoch_end(self, epoch, logs=None):
+        if logs is None:
+            logs = {}
+
         score = self.eval_map()
-        # print ("Rotation Matrix error 2 for epoch %d is %f"%(epoch, score))
-        wandb.log({'rotmatrix-error-2': score})
+        print ("Rotation Matrix error 2 for epoch %d is %f"%(epoch, score))
+        # wandb.log({'rotmatrix-error-2': score})
+        logs['rotmatrix-error-2'] = score
         self.rotmatrix_error2.append(score)
 
 
@@ -380,10 +410,14 @@ class RotMatrixError3(tf.keras.callbacks.Callback):
 
         return np.mean(1 / np.sqrt(2) * np.linalg.norm(rotlog, ord='fro', axis=(1, 2)))
 
-    def on_epoch_end(self, epoch, logs={}):
+    def on_epoch_end(self, epoch, logs=None):
+        if logs is None:
+            logs = {}
+
         score = self.eval_map()
-        # print ("Rotation Matrix error 3 for epoch %d is %f"%(epoch, score))
-        wandb.log({'rotmatrix-error-3': score})
+        print ("Rotation Matrix error 3 for epoch %d is %f"%(epoch, score))
+        # wandb.log({'rotmatrix-error-3': score})
+        logs['rotmatrix-error-3'] = score
         self.rotmatrix_error3.append(score)
 
 
@@ -401,8 +435,12 @@ class RotMatrixError4(tf.keras.callbacks.Callback):
 
         return np.mean(np.linalg.norm(dif, ord='fro', axis=(1, 2)))
 
-    def on_epoch_end(self, epoch, logs={}):
+    def on_epoch_end(self, epoch, logs=None):
+        if logs is None:
+            logs = {}
+
         score = self.eval_map()
-        # print ("Rotation Matrix error 4 for epoch %d is %f"%(epoch, score))
-        wandb.log({'rotmatrix-error-4': score})
+        print ("Rotation Matrix error 4 for epoch %d is %f"%(epoch, score))
+        logs['rotmatrix-error-4'] = score
+        # wandb.log({'rotmatrix-error-4': score})
         self.rotmatrix_error4.append(score)

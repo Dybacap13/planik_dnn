@@ -2,7 +2,7 @@
 # See https://github.com/dcagigas/Robotics/blob/main/Scorbot_ER_VII/inverse_kinematics_ANN/Scorbot_ANN_bootstrapping_96/scorbot_make_models_inverse_kinematics.py
 
 import yaml
-import wandb
+# import wandb
 import random
 import numpy as np
 import tensorflow as tf

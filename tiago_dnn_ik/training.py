@@ -3,7 +3,7 @@
 import os
 import sys
 import yaml
-import wandb
+# import wandb
 import argparse
 import random
 import numpy as np
@@ -17,6 +17,8 @@ from tiago_dnn_mlp.subnet_mlp_train import SevenSubnetMlp
 from tiago_dnn_cnn.cnn_train import Cnn
 from tiago_dnn_rnn.simple_rnn_train import SimpleRnn
 from tiago_dnn_rnn.lstm_train import Lstm
+
+from tensorboard_logs import TensorBoardLogging
 
 
 current_curr = 1
@@ -160,6 +162,7 @@ def val_generator(batch_size):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--name", help="choose name of the DNN model to train", type=str)
+    parser.add_argument("--tensorboard_dir", help="choose name of the DNN model to train", type=str)
     args = parser.parse_args()
 
     if args.name == 'SimpleMlp':
@@ -180,7 +183,10 @@ if __name__ == '__main__':
     with open(f"data/{dnn.config['data_dir']}/data_stats.yaml") as f:
         stats = yaml.safe_load(f)
 
-    wandb.init(project='tiago_dnn_ik_results', name=args.name, tensorboard=True, config=dnn.config)
+    # wandb.init(project='tiago_dnn_ik_results', name=args.name, tensorboard=True, config=dnn.config, )
+
+    # Создаем директорию для логов TensorBoard, если её нет
+    
 
     # Specify the loss fuction, optimizer, metrics
     if args.name == 'SubnetMlp':
@@ -195,15 +201,43 @@ if __name__ == '__main__':
         run_eagerly=True # to access individual elements in loss funct 
     )
 
-    # Train the model
+    # добавила для логирования
+    log_dir = args.tensorboard_dir
+    os.makedirs(log_dir, exist_ok=True)
+    tensorboard_logger = TensorBoardLogging(log_dir)
+
     callbacks_list = [
-        keras.callbacks.TensorBoard(log_dir="logs/"),
-        UpdateLRCurriculumOnPlateau(monitor='val_loss', factor=0.5, patience=5, verbose=dnn.config['verbose'], 
-                                    min_lr=0.0001, max_lr=dnn.config['lr'], total_currs=stats['curriculums'], 
-                                    cooldown=5),
+        keras.callbacks.TensorBoard(log_dir=log_dir,
+                                    histogram_freq=1,  # логировать гистограммы весов
+                                    write_graph=True,  # сохранять граф модели
+                                    write_images=True,  # сохранять изображения весов
+                                    update_freq='epoch'  # как часто обновлять логи
+                                    ),  # стандартный TensorBoard
+        
+        UpdateLRCurriculumOnPlateau(monitor='val_loss', factor=0.5, patience=5, 
+                                    verbose=dnn.config['verbose'], 
+                                    min_lr=0.0001, max_lr=dnn.config['lr'], 
+                                    total_currs=stats['curriculums'], cooldown=5),
         custom_metrics.PositionError(validation_data=val_generator(dnn.config['batch_size']), stats=stats),
-        custom_metrics.OrientationError(validation_data=val_generator(dnn.config['batch_size']), stats=stats)
+        custom_metrics.OrientationError(validation_data=val_generator(dnn.config['batch_size']), stats=stats),
+        tensorboard_logger  # ваш кастомный логгер
+    
     ]
+
+    # Train the model
+    # callbacks_list = [
+    #     keras.callbacks.TensorBoard(log_dir="logs/",
+    #                                 histogram_freq=1,  # логировать гистограммы весов
+    #                                 write_graph=True,  # сохранять граф модели
+    #                                 write_images=True,  # сохранять изображения весов
+    #                                 update_freq='epoch'  # как часто обновлять логи
+    #                                 ),
+    #     UpdateLRCurriculumOnPlateau(monitor='val_loss', factor=0.5, patience=5, verbose=dnn.config['verbose'], 
+    #                                 min_lr=0.0001, max_lr=dnn.config['lr'], total_currs=stats['curriculums'], 
+    #                                 cooldown=5),
+    #     custom_metrics.PositionError(validation_data=val_generator(dnn.config['batch_size']), stats=stats),
+    #     custom_metrics.OrientationError(validation_data=val_generator(dnn.config['batch_size']), stats=stats)
+    # ]
 
     # if dnn.input_size == 7:
     #     callbacks_list.append([custom_metrics.QuaternionError1(validation_data=val_generator(dnn.config['batch_size']), stats=stats),
@@ -215,6 +249,19 @@ if __name__ == '__main__':
     #                             custom_metrics.RotMatrixError2(validation_data=val_generator(dnn.config['batch_size'])),
     #                             custom_metrics.RotMatrixError3(validation_data=val_generator(dnn.config['batch_size'])),
     #                             custom_metrics.RotMatrixError4(validation_data=val_generator(dnn.config['batch_size']))])
+
+
+
+    # Добавим еще один полезный callback для логирования learning rate
+    callbacks_list.append(
+        keras.callbacks.ReduceLROnPlateau(
+            monitor='val_loss',
+            factor=0.5,
+            patience=5,
+            verbose=1,
+            min_lr=0.0001
+        )
+    )
 
     history = dnn.model.fit(
         train_generator(stats['curriculums'], dnn.config['batch_size']),
@@ -239,8 +286,17 @@ if __name__ == '__main__':
     )
 
     eval = dnn.model.evaluate(x_val, y_val, batch_size=dnn.config['batch_size'], callbacks=callbacks_list)
-    wandb.log({'evaluation': {
-                'mse': eval[0], 
-                'pos_error': eval[2], 
-                'orient_error': eval[3]
-                }})
+
+    # wandb.log({'evaluation': {
+    #             'mse': eval[0], 
+    #             'pos_error': eval[2], 
+    #             'orient_error': eval[3]
+    #             }})
+    with open(os.path.join(log_dir, 'evaluation_results.txt'), 'w') as f:
+        f.write(f"Evaluation results:\n")
+        f.write(f"MSE: {eval[0]}\n")
+        f.write(f"Position error: {eval[2]}\n")
+        f.write(f"Orientation error: {eval[3]}\n")
+    
+    print(f"\nEvaluation results saved to {os.path.join(log_dir, 'evaluation_results.txt')}")
+    print(f"Final metrics - MSE: {eval[0]:.6f}, Pos error: {eval[2]:.6f}, Orient error: {eval[3]:.6f}")
