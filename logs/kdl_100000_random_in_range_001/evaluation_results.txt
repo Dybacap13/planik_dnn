@@ -1,0 +1,4 @@
+Evaluation results:
+MSE: 0.16726861894130707
+Position error: 0.9783350825309753
+Orientation error: 1.0241167545318604

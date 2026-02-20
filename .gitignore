@@ -37,20 +37,19 @@
 /.vscode/
 
 # data
-/data
 *.png
 
 # trained models
 *.keras
 
 # logs
-**/logs
+
 **/wandb
 **/*_tuning
 **/__pycache__
 **/test
-**/data
-**.csv
+
+
 tiago_dnn_inference/models/
 tiago_dnn_ik/data
 
