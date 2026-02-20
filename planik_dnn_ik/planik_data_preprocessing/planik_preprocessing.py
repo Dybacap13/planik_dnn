@@ -20,7 +20,7 @@ if __name__ == '__main__':
     parser.add_argument("--curr", help="choose number of curriculums generated for the data", type=int)
     args = parser.parse_args()
 
-    df = pd.read_csv(f'data/pykin/{args.file}.csv')
+    df = pd.read_csv(f'data/{args.file}.csv')
     print(f'Read {args.file}.csv. Here is a sample: ')
     print(df.sample())
 
@@ -32,7 +32,10 @@ if __name__ == '__main__':
     elif 'ee_rot_00' in df.columns:
         x_cols = x_cols + ['ee_rot_00', 'ee_rot_01', 'ee_rot_02', 'ee_rot_10', 'ee_rot_11', 'ee_rot_12']
 
-    y_cols = ['arm_1', 'arm_2', 'arm_3', 'arm_4', 'arm_5', 'arm_6', 'arm_7']
+    # ИСПРАВЛЕНИЕ: используем названия колонок из KDL вместо arm_1...arm_7
+    # y_cols = ['arm_1', 'arm_2', 'arm_3', 'arm_4', 'arm_5', 'arm_6', 'arm_7']
+    y_cols = ['elbow_joint', 'shoulder_lift_joint', 'shoulder_pan_joint', 
+              'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
 
     # Remove duplicates
     print(f'Dropping {df.duplicated(x_cols).sum()} duplicates')
@@ -86,9 +89,9 @@ if __name__ == '__main__':
     thetas = [0, 0, 0, 0, 0, 0, 0]
     shoulder = robot.forward_kin(thetas)['arm_1_link'].pos
 
-    if os.path.exists(f'data/pykin/{args.name}'):
-        shutil.rmtree(f'data/pykin/{args.name}')
-    os.makedirs(f'data/pykin/{args.name}')
+    if os.path.exists(f'data/{args.name}'):
+        shutil.rmtree(f'data/{args.name}')
+    os.makedirs(f'data/{args.name}')
 
     # Validation and test set
     x = df[x_cols].to_numpy()
@@ -99,16 +102,16 @@ if __name__ == '__main__':
     x, x_test, y, y_test = train_test_split(x, y, test_size=test_size)
     df = pd.DataFrame(np.concatenate((x, y), axis=1), columns=x_cols + y_cols)
 
-    with open(f'data/pykin/{args.name}/x_val.npy', 'wb') as f:
+    with open(f'data/{args.name}/x_val.npy', 'wb') as f:
         np.save(f, x_val)
 
-    with open(f'data/pykin/{args.name}/y_val.npy', 'wb') as f:
+    with open(f'data/{args.name}/y_val.npy', 'wb') as f:
         np.save(f, y_val)
 
-    with open(f'data/pykin/{args.name}/x_test.npy', 'wb') as f:
+    with open(f'data/{args.name}/x_test.npy', 'wb') as f:
         np.save(f, x_test)
 
-    with open(f'data/pykin/{args.name}/y_test.npy', 'wb') as f:
+    with open(f'data/{args.name}/y_test.npy', 'wb') as f:
         np.save(f, y_test)
 
 
@@ -128,13 +131,13 @@ if __name__ == '__main__':
         y_train = df_curr[y_cols].to_numpy()
 
         # Save
-        with open(f'data/pykin/{args.name}/x_train_curr{i+1}.npy', 'wb') as f:
+        with open(f'data/{args.name}/x_train_curr{i+1}.npy', 'wb') as f:
             np.save(f, x_train)
 
-        with open(f'data/pykin/{args.name}/y_train_curr{i+1}.npy', 'wb') as f:
+        with open(f'data/{args.name}/y_train_curr{i+1}.npy', 'wb') as f:
             np.save(f, y_train)
 
-    with open(f'data/pykin/{args.name}/data_stats.yaml', 'w') as f:
+    with open(f'data/{args.name}/data_stats.yaml', 'w') as f:
         data_stats['test_size'] = test_size
         data_stats['curriculums'] = args.curr
         data_stats['curriculum_sizes'] = curr_sizes

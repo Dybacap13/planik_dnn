@@ -53,3 +53,7 @@
 **.csv
 tiago_dnn_inference/models/
 tiago_dnn_ik/data
+
+
+/pykin
+/planik_venv
