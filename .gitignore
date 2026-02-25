@@ -40,7 +40,7 @@
 *.png
 
 # trained models
-*.keras
+
 
 # logs
 

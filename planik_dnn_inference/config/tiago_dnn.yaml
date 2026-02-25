@@ -1,0 +1,2 @@
+model: 'simple_mlp.keras'
+stats: '6subnet_mlp.yaml'
