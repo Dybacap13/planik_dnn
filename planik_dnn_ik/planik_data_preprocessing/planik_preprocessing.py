@@ -10,6 +10,7 @@ from sklearn.model_selection import train_test_split
 from pykin.robots.single_arm import SingleArm
 from pykin.kinematics.transform import Transform
 
+from ament_index_python.packages import get_package_share_directory
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -20,7 +21,12 @@ if __name__ == '__main__':
     parser.add_argument("--curr", help="choose number of curriculums generated for the data", type=int)
     args = parser.parse_args()
 
-    df = pd.read_csv(f'data/{args.file}.csv')
+    package_path = get_package_share_directory('planik_models')
+    save_dir = os.path.join(package_path, args.name, 'preprocessing')
+    csv_file = os.path.join(package_path, args.name)
+
+
+    df = pd.read_csv(f'd{csv_file}.csv')
     print(f'Read {args.file}.csv. Here is a sample: ')
     print(df.sample())
 
@@ -89,9 +95,11 @@ if __name__ == '__main__':
     thetas = [0, 0, 0, 0, 0, 0, 0]
     shoulder = robot.forward_kin(thetas)['arm_1_link'].pos
 
-    if os.path.exists(f'data/{args.name}'):
-        shutil.rmtree(f'data/{args.name}')
-    os.makedirs(f'data/{args.name}')
+    
+
+    if os.path.exists(save_dir):
+        shutil.rmtree(save_dir)
+    os.makedirs(save_dir)
 
     # Validation and test set
     x = df[x_cols].to_numpy()
@@ -102,16 +110,16 @@ if __name__ == '__main__':
     x, x_test, y, y_test = train_test_split(x, y, test_size=test_size)
     df = pd.DataFrame(np.concatenate((x, y), axis=1), columns=x_cols + y_cols)
 
-    with open(f'data/{args.name}/x_val.npy', 'wb') as f:
+    with open(f'{save_dir}/x_val.npy', 'wb') as f:
         np.save(f, x_val)
 
-    with open(f'data/{args.name}/y_val.npy', 'wb') as f:
+    with open(f'{save_dir}/y_val.npy', 'wb') as f:
         np.save(f, y_val)
 
-    with open(f'data/{args.name}/x_test.npy', 'wb') as f:
+    with open(f'{save_dir}/x_test.npy', 'wb') as f:
         np.save(f, x_test)
 
-    with open(f'data/{args.name}/y_test.npy', 'wb') as f:
+    with open(f'{save_dir}/y_test.npy', 'wb') as f:
         np.save(f, y_test)
 
 
@@ -131,17 +139,17 @@ if __name__ == '__main__':
         y_train = df_curr[y_cols].to_numpy()
 
         # Save
-        with open(f'data/{args.name}/x_train_curr{i+1}.npy', 'wb') as f:
+        with open(f'{save_dir}/x_train_curr{i+1}.npy', 'wb') as f:
             np.save(f, x_train)
 
-        with open(f'data/{args.name}/y_train_curr{i+1}.npy', 'wb') as f:
+        with open(f'{save_dir}/y_train_curr{i+1}.npy', 'wb') as f:
             np.save(f, y_train)
 
-    with open(f'data/{args.name}/data_stats.yaml', 'w') as f:
+    with open(f'{save_dir}/data_stats.yaml', 'w') as f:
         data_stats['test_size'] = test_size
         data_stats['curriculums'] = args.curr
         data_stats['curriculum_sizes'] = curr_sizes
         yaml.dump(data_stats, f)
 
-    print('Done! Files split and saved')
+    print(f'Done! Files split and saved {save_dir}')
     print(f'{args.curr} curriculums have been generated, with sizes {curr_sizes}')
