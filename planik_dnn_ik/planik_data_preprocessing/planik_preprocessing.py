@@ -38,8 +38,7 @@ if __name__ == '__main__':
     elif 'ee_rot_00' in df.columns:
         x_cols = x_cols + ['ee_rot_00', 'ee_rot_01', 'ee_rot_02', 'ee_rot_10', 'ee_rot_11', 'ee_rot_12']
 
-    # ИСПРАВЛЕНИЕ: используем названия колонок из KDL вместо arm_1...arm_7
-    # y_cols = ['arm_1', 'arm_2', 'arm_3', 'arm_4', 'arm_5', 'arm_6', 'arm_7']
+ 
     y_cols = ['elbow_joint', 'shoulder_lift_joint', 'shoulder_pan_joint', 
               'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
 
