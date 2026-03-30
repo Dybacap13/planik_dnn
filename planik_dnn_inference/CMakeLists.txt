@@ -16,10 +16,10 @@ find_package(geometry_msgs REQUIRED)
 ament_python_install_package(${PROJECT_NAME})
 
 # Install Python modules and scripts
-install(PROGRAMS
-  scripts/model_infer_node.py
-  DESTINATION lib/${PROJECT_NAME}
-)
+# install(PROGRAMS
+#   scripts/model_infer_node.py
+#   DESTINATION lib/${PROJECT_NAME}
+# )
 
 install(DIRECTORY
   config
